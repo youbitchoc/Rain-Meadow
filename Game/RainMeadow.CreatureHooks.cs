@@ -17,6 +17,10 @@ namespace RainMeadow
             On.AbstractCreature.InDenUpdate += AbstractCreature_InDenUpdate; // Don't think
 
             On.ScavengerAbstractAI.InitGearUp += ScavengerAbstractAI_InitGearUp;
+
+            On.EggBug.DropEggs += EggBug_DropEggs;
+            On.Vulture.DropMask += Vulture_DropMask;
+            On.BigSpider.BabyPuff += BigSpider_BabyPuff;
         }
 
         private void ScavengerAbstractAI_InitGearUp(On.ScavengerAbstractAI.orig_InitGearUp orig, ScavengerAbstractAI self)
@@ -113,6 +117,37 @@ namespace RainMeadow
                 {
                     return;
                 }
+            }
+            orig(self);
+        }
+
+        // HACK: doesn't play sounds, we should IL hook to only disable spawning
+        private void EggBug_DropEggs(On.EggBug.orig_DropEggs orig, EggBug self)
+        {
+            if (OnlineManager.lobby != null && OnlinePhysicalObject.map.TryGetValue(self.abstractCreature, out var oe) && !oe.isMine)
+            {
+                self.dropEggs = false;
+                return;
+            }
+            orig(self);
+        }
+
+        private void Vulture_DropMask(On.Vulture.orig_DropMask orig, Vulture self, Vector2 violenceDir)
+        {
+            if (OnlineManager.lobby != null && OnlinePhysicalObject.map.TryGetValue(self.abstractCreature, out var oe) && !oe.isMine)
+            {
+                (self.State as Vulture.VultureState).mask = false;
+                return;
+            }
+            orig(self, violenceDir);
+        }
+
+        private void BigSpider_BabyPuff(On.BigSpider.orig_BabyPuff orig, BigSpider self)
+        {
+            if (OnlineManager.lobby != null && OnlinePhysicalObject.map.TryGetValue(self.abstractCreature, out var oe) && !oe.isMine)
+            {
+                self.spewBabies = true;
+                return;
             }
             orig(self);
         }
