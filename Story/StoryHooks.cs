@@ -510,12 +510,17 @@ namespace RainMeadow
 
         private SaveState PlayerProgression_GetOrInitiateSaveState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self, SlugcatStats.Name saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
         {
+            var currentSaveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
             if (isStoryMode(out var storyGameMode))
             {
-                var origLoadInProgress = self.loadInProgress;
-                if (!OnlineManager.lobby.isOwner && self.starvedSaveState is null) self.loadInProgress = true;  // don't load client save
-                var currentSaveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
-                self.loadInProgress = origLoadInProgress;
+                if (OnlineManager.lobby.isOwner)
+                {
+                    storyGameMode.saveStateString = currentSaveState?.SaveToString();
+                }
+                else
+                {
+                    currentSaveState.LoadGame(storyGameMode.saveStateString ?? "", game);
+                }
 
                 if (!OnlineManager.lobby.isOwner)
                 {
@@ -537,11 +542,9 @@ namespace RainMeadow
                 {
                     storyGameMode.defaultDenPos = currentSaveState.denPosition;
                 }
-
-                return currentSaveState;
             }
 
-            return orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
+            return currentSaveState;
         }
 
         private bool PlayerProgression_SaveToDisk(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self, bool saveCurrentState, bool saveMaps, bool saveMiscProg)

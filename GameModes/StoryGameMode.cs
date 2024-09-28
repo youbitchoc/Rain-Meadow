@@ -21,7 +21,7 @@ namespace RainMeadow
         public Dictionary<string, int> storyIntRemixSettings;
         public Dictionary<ushort, ushort[]> consumedItems;
         public StoryClientSettingsData storyClientData;
-
+        public string? saveStateString;
 
         public bool saveToDisk = false;
 

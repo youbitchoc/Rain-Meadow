@@ -52,6 +52,8 @@ namespace RainMeadow
             public Dictionary<string, float> storyFloatRemixSettings;
             [OnlineField]
             public Dictionary<string, int> storyIntRemixSettings;
+            [OnlineField(nullable=true)]
+            public string? saveStateString;
 
 
             public State() { }
@@ -73,6 +75,7 @@ namespace RainMeadow
                 isInGame = RWCustom.Custom.rainWorld.processManager.currentMainLoop is RainWorldGame;
                 changedRegions = storyGameMode.changedRegions;
                 didStartCycle = storyGameMode.didStartCycle;
+                saveStateString = storyGameMode.saveStateString;
                 if (currentGameState?.session is StoryGameSession storySession)
                 {
                     cycleNumber = storySession.saveState.cycleNumber;
@@ -132,9 +135,7 @@ namespace RainMeadow
                 (lobby.gameMode as StoryGameMode).changedRegions = changedRegions;
                 (lobby.gameMode as StoryGameMode).didStartCycle = didStartCycle;
                 (lobby.gameMode as StoryGameMode).friendlyFire = friendlyFire;
-
-
-
+                (lobby.gameMode as StoryGameMode).saveStateString = saveStateString;
             }
         }
     }
