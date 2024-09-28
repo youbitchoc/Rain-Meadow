@@ -20,6 +20,7 @@ namespace RainMeadow
         public Dictionary<string, int> storyIntRemixSettings;
         public StoryClientSettingsData storyClientData;
 
+        public string? saveStateString;
 
         public bool saveToDisk = false;
 

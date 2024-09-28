@@ -107,10 +107,7 @@ namespace RainMeadow
         {
             foreach (OnlinePlayer player in OnlineManager.players)
             {
-                if (!player.OutgoingEvents.Any(e => e is RPCEvent rpc && rpc.IsIdentical(RPCs.GoToDeathScreen)))
-                {
-                    player.InvokeRPC(RPCs.GoToDeathScreen);
-                }
+                player.InvokeOnceRPC(RPCs.GoToDeathScreen);
             }
         }
 
@@ -151,19 +148,11 @@ namespace RainMeadow
 
             storyGameMode.defaultDenPos = game.GetStorySession.saveState.denPosition = denPos;
 
+            game.GetStorySession.saveState.SessionEnded(game, true, malnourished);
+
             foreach (OnlinePlayer player in OnlineManager.players)
             {
-                if (!player.OutgoingEvents.Any(e => e is RPCEvent rpc && rpc.IsIdentical(RPCs.GoToWinScreen, malnourished, denPos)))
-                {
-                    if (player.isMe)
-                    {
-                        GoToWinScreen(malnourished, denPos);
-                    }
-                    else
-                    {
-                        player.InvokeRPC(RPCs.GoToWinScreen, malnourished, denPos);
-                    }
-                }
+                player.InvokeOnceRPC(RPCs.GoToWinScreen, malnourished, denPos);
             }
         }
 

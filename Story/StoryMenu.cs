@@ -130,6 +130,7 @@ namespace RainMeadow
             gameMode.defaultDenPos = null;
             gameMode.myLastDenPos = null;
             gameMode.hasSheltered = false;
+            gameMode.saveStateString = null;
         }
 
         private void SetupHostMenu()

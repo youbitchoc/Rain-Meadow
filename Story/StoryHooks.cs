@@ -5,6 +5,7 @@ using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace RainMeadow
@@ -55,8 +56,8 @@ namespace RainMeadow
             On.RainWorldGame.GoToDeathScreen += RainWorldGame_GoToDeathScreen;
             On.RainWorldGame.Win += RainWorldGame_Win;
 
-            On.SaveState.BringUpToDate += SaveState_BringUpToDate;
             IL.SaveState.SessionEnded += SaveState_SessionEnded;
+            On.SaveState.SessionEnded += SaveState_SessionEnded1;
 
             On.WaterNut.Swell += WaterNut_Swell;
             On.SporePlant.Pacify += SporePlant_Pacify;
@@ -508,14 +509,81 @@ namespace RainMeadow
             }
         }
 
+        static readonly string[] joarxml = {
+            "<cA>",
+            "<cB>",
+            "<cC>",
+            "<coA>",
+            "<coB>",
+            "<dpA>",
+            "<dpB>",
+            "<dpC>",
+            "<dpD>",
+            "<egA>",
+            "<mpdA>",
+            "<mpdB>",
+            "<mpdC>",
+            "<mwA>",
+            "<mwB>",
+            "<oA>",
+            "<pOT>",
+            "<progDivA>",
+            "<progDivB>",
+            "<rA>",
+            "<rB>",
+            "<rgA>",
+            "<rgB>",
+            "<rgC>",
+            "<stkA>",
+            "<svA>",
+            "<svB>",
+            "<svC>",
+            "<svD>",
+            "<wsA>",
+        };
+
+        public static string DeflateJoarXML(string s)
+        {
+            if (s is null) return null;
+            for (var i = 0; i < joarxml.Length; i++)
+                s = s.Replace(joarxml[i], ((char)(i + 1)).ToString());
+            return s;
+        }
+
+        public static string InflateJoarXML(string s)
+        {
+            if (s is null) return null;
+            for (var i = 0; i < joarxml.Length; i++)
+                s = s.Replace(((char)(i + 1)).ToString(), joarxml[i]);
+            return s;
+        }
+
+        private static string SaveStateToString(SaveState? saveState)
+        {
+            if (saveState is null) return null;
+
+            var s = saveState.SaveToString();
+            RainMeadow.Debug($"origSaveState[{s.Length}]:{s}");
+            s = Regex.Replace(s, @"(TUTMESSAGES|LINEAGES|OBJECTS|OBJECTTRACKERS|POPULATION|STICKS|RESPAWNS|WAITRESPAWNS|COMMUNITIES|SWALLOWEDITEMS|UNRECOGNIZEDSWALLOWED|FLOWERPOS)<(.*?)B>.*?<\2A>", "");
+            RainMeadow.Debug($"trimSaveState[{s.Length}]:{s}");
+            s = DeflateJoarXML(s);
+            RainMeadow.Debug($"abbrSaveState[{s.Length}]:{s}");
+            return s;
+        }
+
         private SaveState PlayerProgression_GetOrInitiateSaveState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self, SlugcatStats.Name saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
         {
+            var currentSaveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
             if (isStoryMode(out var storyGameMode))
             {
-                var origLoadInProgress = self.loadInProgress;
-                if (!OnlineManager.lobby.isOwner && self.starvedSaveState is null) self.loadInProgress = true;  // don't load client save
-                var currentSaveState = orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
-                self.loadInProgress = origLoadInProgress;
+                if (OnlineManager.lobby.isOwner)
+                {
+                    storyGameMode.saveStateString ??= SaveStateToString(currentSaveState);  // handled by SessionEnded after campaign init
+                }
+                else
+                {
+                    currentSaveState.LoadGame(InflateJoarXML(storyGameMode.saveStateString) ?? "", game);
+                }
 
                 if (storyGameMode.myLastDenPos != null)
                 {
@@ -533,7 +601,7 @@ namespace RainMeadow
                 return currentSaveState;
             }
 
-            return orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
+            return currentSaveState;
         }
 
         private bool PlayerProgression_SaveToDisk(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self, bool saveCurrentState, bool saveMaps, bool saveMiscProg)
@@ -578,17 +646,12 @@ namespace RainMeadow
             }
         }
 
-        private void SaveState_BringUpToDate(On.SaveState.orig_BringUpToDate orig, SaveState self, RainWorldGame game)
+        private void SaveState_SessionEnded1(On.SaveState.orig_SessionEnded orig, SaveState self, RainWorldGame game, bool survived, bool newMalnourished)
         {
+            orig(self, game, survived, newMalnourished);
             if (isStoryMode(out var gameMode))
             {
-                var denPos = self.denPosition;
-                orig(self, game);
-                self.denPosition = denPos;
-            }
-            else
-            {
-                orig(self, game);
+                gameMode.saveStateString = SaveStateToString(self);
             }
         }
 
