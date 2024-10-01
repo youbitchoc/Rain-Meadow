@@ -5,6 +5,7 @@ using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace RainMeadow
@@ -515,7 +516,16 @@ namespace RainMeadow
             {
                 if (OnlineManager.lobby.isOwner)
                 {
-                    storyGameMode.saveStateString = currentSaveState?.SaveToString();
+                    storyGameMode.saveStateString = currentSaveState?.SaveToString()?
+                        .Replace("LINEAGES<rgB>*?<rgA>", "")
+                        .Replace("OBJECTS<rgB>*?<rgA>", "")
+                        .Replace("POPULATION<rgB>*?<rgA>", "")
+                        .Replace("STICKS<rgB>*?<rgA>", "")
+                        .Replace("RESPAWNS<svB>*?<svA>", "")
+                        .Replace("WAITRESPAWNS<svB>*?<svA>", "")
+                        .Replace("COMMUNITIES<svB>*?<svA>", "")
+                        .Replace("SWALLOWEDITEMS<svB>*?<svA>", "")
+                        .Replace("UNRECOGNIZEDSWALLOWED<svB>*?<svA>", "");
                 }
                 else
                 {
