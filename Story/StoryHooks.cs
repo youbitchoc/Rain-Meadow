@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using HUD;
 using Mono.Cecil.Cil;
@@ -504,7 +505,20 @@ namespace RainMeadow
             {
                 if (OnlineManager.lobby.isOwner)
                 {
-                    gameMode.saveStateString = origSaveState?.SaveToString();
+                    var text = origSaveState?.SaveToString();
+                    if (text != null)
+                    {
+                        text = Regex.Replace(text, "LINEAGES<rgB>*?<rgA>", "");
+                        text = Regex.Replace(text, "OBJECTS<rgB>*?<rgA>", "");
+                        text = Regex.Replace(text, "POPULATION<rgB>*?<rgA>", "");
+                        text = Regex.Replace(text, "STICKS<rgB>*?<rgA>", "");
+                        text = Regex.Replace(text, "RESPAWNS<svB>*?<svA>", "");
+                        text = Regex.Replace(text, "WAITRESPAWNS<svB>*?<svA>", "");
+                        text = Regex.Replace(text, "COMMUNITIES<svB>*?<svA>", "");
+                        text = Regex.Replace(text, "SWALLOWEDITEMS<svB>*?<svA>", "");
+                        text = Regex.Replace(text, "UNRECOGNIZEDSWALLOWED<svB>*?<svA>", "");
+                    }
+                    gameMode.saveStateString = text;
                 }
                 else if (gameMode.saveStateString != null)
                 {
