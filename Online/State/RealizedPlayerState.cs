@@ -14,6 +14,10 @@ namespace RainMeadow
         private bool standing;
         [OnlineField]
         private bool glowing;
+        [OnlineField(nullable = true)]
+        private OnlineEntity.EntityId? spearOnBack;
+        //[OnlineField(nullable = true)]
+        //private OnlineEntity.EntityId? slugOnBack;
         [OnlineField(group = "inputs")]
         private ushort inputs;
         [OnlineFieldHalf(group = "inputs")]
@@ -31,6 +35,10 @@ namespace RainMeadow
             bodyModeIndex = (byte)p.bodyMode.Index;
             standing = p.standing;
             glowing = p.glowing;
+            spearOnBack = (p.spearOnBack?.spear?.abstractPhysicalObject is AbstractPhysicalObject apo
+                && OnlinePhysicalObject.map.TryGetValue(apo, out var oe)) ? oe.id : null;
+            //slugOnBack = (p.slugOnBack?.slugcat?.abstractPhysicalObject is AbstractPhysicalObject apo0
+            //    && OnlinePhysicalObject.map.TryGetValue(apo0, out var oe0)) ? oe0.id : null;
             var i = p.input[0];
             inputs = (ushort)(
                   (i.x == 1 ? 1 << 0 : 0)
@@ -78,6 +86,10 @@ namespace RainMeadow
                 pl.bodyMode = new Player.BodyModeIndex(Player.BodyModeIndex.values.GetEntry(bodyModeIndex));
                 pl.standing = standing;
                 pl.glowing = glowing;
+                if (pl.spearOnBack != null)
+                    pl.spearOnBack.spear = (spearOnBack?.FindEntity() as OnlinePhysicalObject)?.apo?.realizedObject as Spear;
+                //if (pl.slugOnBack != null)
+                //    pl.slugOnBack.slugcat = (slugOnBack?.FindEntity() as OnlinePhysicalObject)?.apo?.realizedObject as Player;
             }
             else
             {
