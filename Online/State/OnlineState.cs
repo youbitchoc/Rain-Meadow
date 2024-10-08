@@ -63,6 +63,7 @@ namespace RainMeadow
             public static readonly StateType RealizedCreatureState = new("RealizedCreatureState", typeof(RealizedCreatureState));
             public static readonly StateType RealizedPlayerState = new("RealizedPlayerState", typeof(RealizedPlayerState));
             public static readonly StateType RealizedTubeWormState = new("RealizedTubeWormState", typeof(RealizedTubeWormState));
+            public static readonly StateType RealizedDaddyLongLegsState = new("RealizedDaddyLongLegsState", typeof(RealizedDaddyLongLegsState));
             public static readonly StateType RealizedOverseerState = new("RealizedOverseerState", typeof(RealizedOverseerState));
             public static readonly StateType RealizedWeaponState = new("RealizedWeaponState", typeof(RealizedWeaponState));
             public static readonly StateType RealizedSporePlantState = new("RealizedSporePlantState", typeof(RealizedSporePlantState));
