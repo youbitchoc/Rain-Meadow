@@ -158,11 +158,22 @@ namespace RainMeadow
             string serializedObject = newObjectEvent.MakeSerializedObject(initialState);
             RainMeadow.Debug("serializedObject: " + serializedObject);
 
-            var apo = AbstractCreatureFromString(world, serializedObject);
-            id.altSeed = apo.ID.RandomSeed;
-            apo.ID = id;
-            apo.pos = initialState.pos;
-            return apo;
+            var ac = AbstractCreatureFromString(world, serializedObject);
+            if (ac.state == null)
+            {
+                if (ac.creatureTemplate.TopAncestor().type == CreatureTemplate.Type.Slugcat)
+                {
+                    ac.state = new PlayerState(ac, 0, RainMeadow.Ext_SlugcatStatsName.OnlineSessionRemotePlayer, false); // playerState is not serialized, initialize with dummy
+                }
+                else
+                {
+                    RainMeadow.Error($"Missing state for {ac} of type {ac.creatureTemplate}");
+                }
+            }
+            id.altSeed = ac.ID.RandomSeed;
+            ac.ID = id;
+            ac.pos = initialState.pos;
+            return ac;
         }
 
         public override void Deregister()
