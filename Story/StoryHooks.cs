@@ -352,9 +352,9 @@ namespace RainMeadow
             {
                 if (!OnlinePhysicalObject.map.TryGetValue(self.abstractPhysicalObject, out var oe))
                     throw new InvalidProgrammerException("Player doesn't have OnlineEntity counterpart!!");
-                var scs = OnlineManager.lobby.activeEntities.OfType<StoryClientSettings>().FirstOrDefault(e => e.owner == oe.owner);
-                if (scs == null) throw new InvalidProgrammerException("OnlinePlayer doesn't have StoryClientSettings!!");
-                self.SlugCatClass = scs.playingAs;
+                if (!OnlineManager.lobby.clientSettings.TryGetValue(oe.owner, out var cs))
+                    throw new InvalidProgrammerException("OnlinePlayer doesn't have StoryClientSettings!!");
+                self.SlugCatClass = (cs as StoryClientSettings).playingAs;
             }
         }
 

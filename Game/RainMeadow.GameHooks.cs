@@ -274,12 +274,13 @@ namespace RainMeadow
             {
                 doneCutscene = false;
                 saveStateNumber = OnlineManager.lobby.gameMode.GetStorySessionPlayer(game);
-                if (isStoryMode(out var story))
-                {
-                    story.storyClientSettings.isDead = false;
-                }
             }
             orig(self, saveStateNumber, game);
+            if (isStoryMode(out var story))
+            {
+                story.storyClientSettings.isDead = false;
+                self.characterStats = new SlugcatStats(story.storyClientSettings.playingAs, self.saveState.malnourished);
+            }
         }
 
         private void RainWorldGame_RawUpdate(On.RainWorldGame.orig_RawUpdate orig, RainWorldGame self, float dt)
