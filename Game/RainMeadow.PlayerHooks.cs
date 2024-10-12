@@ -306,7 +306,12 @@ public partial class RainMeadow
         {
             if (!self.abstractPhysicalObject.IsLocal(out var oe))
             {
-                self.controller = new OnlineController(oe, self); // remote player
+                // remote player
+                if (!ent.isMine)
+                {
+                    self.controller = new OnlineController(oe, self);
+                    ((PlayerState)self.State).playerNumber = world.game.StoryPlayerCount; // fix DMS applying to remote scugs
+                }
             }
             else if (oe is null)
             {
