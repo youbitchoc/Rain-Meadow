@@ -442,5 +442,17 @@ namespace RainMeadow
 
             orig(self);
         }
+
+        /* HACK: what the hell
+        private void RoomRealizer_KillRoom(On.RoomRealizer.orig_KillRoom orig, RoomRealizer self, AbstractRoom room)
+        {
+            if (OnlineManager.lobby != null)
+            {
+                if (self.world.game.Players[0].Room == room) return;
+            }
+
+            orig(self, room);
+        }
+        */
     }
 }
