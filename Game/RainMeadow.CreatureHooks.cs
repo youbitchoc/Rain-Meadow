@@ -23,6 +23,7 @@ namespace RainMeadow
             On.BigSpider.BabyPuff += BigSpider_BabyPuff;
 
             On.EggBugGraphics.Update += EggBugGraphics_Update;
+            On.BigSpiderGraphics.Update += BigSpiderGraphics_Update;
         }
 
         private void EggBugGraphics_Update(On.EggBugGraphics.orig_Update orig, EggBugGraphics self)
@@ -35,6 +36,16 @@ namespace RainMeadow
                 // pos are set to different when sput out
                 // but due to the suckedintoshortcut not removing client-sided when ran by the creature (it waits for the RPC)
                 // then the bad values do happen
+                self.bug.bodyChunks[1].pos += Vector2.down;
+            }
+            orig(self);
+        }
+
+        private static void BigSpiderGraphics_Update(On.BigSpiderGraphics.orig_Update orig, BigSpiderGraphics self)
+        {
+            if (self.bug.bodyChunks[0].pos == self.bug.bodyChunks[1].pos)
+            {
+                // spiders do this too
                 self.bug.bodyChunks[1].pos += Vector2.down;
             }
             orig(self);
