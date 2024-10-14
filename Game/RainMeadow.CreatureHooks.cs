@@ -143,7 +143,6 @@ namespace RainMeadow
                 self.spewBabies = true;
                 return;
             }
-            orig(self);
         }
     }
 }
