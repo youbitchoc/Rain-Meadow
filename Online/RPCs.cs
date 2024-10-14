@@ -90,6 +90,13 @@ namespace RainMeadow
         }
 
         [RPCMethod]
+        public static void ReadyForShelter()
+        {
+            if (RainMeadow.isStoryMode(out var story))
+                story.sheltering = true;
+        }
+
+        [RPCMethod]
         public static void MovePlayersToDeathScreen()
         {
             foreach (OnlinePlayer player in OnlineManager.players)

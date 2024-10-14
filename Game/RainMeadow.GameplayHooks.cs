@@ -240,10 +240,14 @@ namespace RainMeadow
                 foreach (var scs in OnlineManager.lobby.clientSettings.Values.Cast<StoryClientSettings>())
                     RainMeadow.Debug($"player {scs.owner} inGame:{scs.inGame} isDead:{scs.isDead} readyForWin:{scs.readyForWin}");
 
-                if (OnlineManager.lobby.clientSettings.Values.Cast<StoryClientSettings>()
-                    .Any(scs => scs.inGame && !scs.isDead && !scs.readyForWin))
+                if (!storyGameMode.sheltering)
                 {
-                    return;
+                    if (OnlineManager.lobby.clientSettings.Values.Cast<StoryClientSettings>()
+                        .Any(scs => scs.inGame && !scs.isDead && !scs.readyForWin))
+                    {
+                        return;
+                    }
+                    OnlineManager.lobby.owner.InvokeOnceRPC(RPCs.ReadyForShelter);
                 }
             }
             else
