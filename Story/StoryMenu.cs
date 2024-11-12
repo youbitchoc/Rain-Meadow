@@ -128,8 +128,6 @@ namespace RainMeadow
             gameMode.changedRegions = false;
             gameMode.didStartCycle = false;
             gameMode.defaultDenPos = null;
-            gameMode.ghostsTalkedTo = new();
-            gameMode.consumedItems = new();
             gameMode.myLastDenPos = null;
             gameMode.hasSheltered = false;
         }

@@ -15,11 +15,9 @@ namespace RainMeadow
         public string? myLastDenPos = null;
         public bool hasSheltered = false;
         public SlugcatStats.Name currentCampaign;
-        public Dictionary<string, int> ghostsTalkedTo;
         public Dictionary<string, bool> storyBoolRemixSettings;
         public Dictionary<string, float> storyFloatRemixSettings;
         public Dictionary<string, int> storyIntRemixSettings;
-        public Dictionary<ushort, ushort[]> consumedItems;
         public StoryClientSettingsData storyClientData;
 
 
@@ -127,24 +125,6 @@ namespace RainMeadow
         public override void ResourceActive(OnlineResource onlineResource)
         {
             base.ResourceActive(onlineResource);
-            if (onlineResource is WorldSession ws)
-            {
-                var regionState = ws.world.regionState;
-                if (lobby.isOwner)
-                {
-                    ghostsTalkedTo = regionState.saveState.deathPersistentSaveData.ghostsTalkedTo.ToDictionary(kvp => kvp.Key.value, kvp => kvp.Value);
-                    consumedItems = regionState.consumedItems
-                        .Concat(regionState.saveState.deathPersistentSaveData.consumedFlowers) // HACK: group karma flowers with items, room:index shouldn't overlap
-                        .GroupBy(x => x.originRoom)
-                        .ToDictionary(x => (ushort)x.Key, x => x.Select(y => (ushort)y.placedObjectIndex).ToArray());
-                }
-                else
-                {
-                    regionState.consumedItems = consumedItems
-                        .SelectMany(kvp => kvp.Value.Select(v => new RegionState.ConsumedItem(kvp.Key, v, 2))).ToList(); // must be >1
-                    regionState.saveState.deathPersistentSaveData.consumedFlowers = regionState.consumedItems;
-                }
-            }
         }
 
         public override void ConfigureAvatar(OnlineCreature onlineCreature)
