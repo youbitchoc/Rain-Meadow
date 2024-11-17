@@ -101,34 +101,6 @@ namespace RainMeadow
             (RWCustom.Custom.rainWorld.processManager.currentMainLoop as RainWorldGame).cameras[0].hud.karmaMeter.reinforceAnimation = 0;
         }
 
-
-        [RPCMethod]
-        public static void MovePlayersToDeathScreen()
-        {
-            foreach (OnlinePlayer player in OnlineManager.players)
-            {
-                player.InvokeOnceRPC(RPCs.GoToDeathScreen);
-            }
-        }
-
-        [RPCMethod]
-        public static void GoToDeathScreen()
-        {
-            var game = (RWCustom.Custom.rainWorld.processManager.currentMainLoop as RainWorldGame);
-            if (game == null || game.manager.upcomingProcess != null)
-            {
-                return;
-            }
-            if (game.IsStorySession && game.GetStorySession.RedIsOutOfCycles && !game.rainWorld.ExpeditionMode)
-            {
-                game.GoToRedsGameOver();
-                return;
-            }
-            game.GetStorySession.saveState.SessionEnded(game, false, false);
-            RainMeadow.Debug("I am moving to the deathscreen");
-            game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.DeathScreen);
-        }
-
         [RPCMethod]
         public static void MovePlayersToWinScreen(bool malnourished, string denPos)
         {
@@ -148,31 +120,20 @@ namespace RainMeadow
 
             storyGameMode.defaultDenPos = game.GetStorySession.saveState.denPosition = denPos;
 
-            game.GetStorySession.saveState.SessionEnded(game, true, malnourished);
+            game.Win(malnourished);
 
             foreach (OnlinePlayer player in OnlineManager.players)
             {
-                player.InvokeOnceRPC(RPCs.GoToWinScreen, malnourished, denPos);
+                if (!player.isMe)
+                    player.InvokeOnceRPC(RPCs.GoToWinScreen, malnourished, denPos);
             }
         }
 
-        //Assumed to be called for storymode only
         [RPCMethod]
-        public static void GoToWinScreen(bool malnourished, string denPos)
+        public static void SessionEnded(bool survived, string newMalnourished)
         {
-            var game = RWCustom.Custom.rainWorld.processManager.currentMainLoop as RainWorldGame;
-            if (game == null || game.manager.upcomingProcess != null) return;
+            if (!(RWCustom.Custom.rainWorld.processManager.currentMainLoop is RainWorldGame game && game.manager.upcomingProcess is null)) return;
 
-            if (OnlineManager.lobby.isOwner)
-            {
-                if (!malnourished && !game.rainWorld.saveBackedUp)
-                {
-                    game.rainWorld.saveBackedUp = true;
-                    game.rainWorld.progression.BackUpSave("_Backup");
-                }
-            }
-            else
-            {
                 var storyGameMode = (OnlineManager.lobby.gameMode as StoryGameMode);
                 if (!storyGameMode.hasSheltered)
                 {
@@ -199,36 +160,12 @@ namespace RainMeadow
             game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SleepScreen);
         }
 
-
         [RPCMethod]
-        public static void MovePlayersToGhostScreen(string ghostID)
+        public static void GhostShutDown(GhostWorldPresence.GhostID ghostID)
         {
-            foreach (OnlinePlayer player in OnlineManager.players)
-            {
-                player.InvokeRPC(RPCs.GoToGhostScreen, ghostID);
-            }
+            if (!(RWCustom.Custom.rainWorld.processManager.currentMainLoop is RainWorldGame game && game.manager.upcomingProcess is null)) return;
+            game.GhostShutDown(ghostID);
         }
-
-        [RPCMethod]
-        public static void GoToGhostScreen(string ghostID)
-        {
-            //For MSC support, we'll need to add a check for artificer campaign and send it to the VengeanceGhostScreen
-            var game = (RWCustom.Custom.rainWorld.processManager.currentMainLoop as RainWorldGame);
-            if (game.manager.upcomingProcess != null)
-            {
-                return;
-            }
-            ExtEnumBase.TryParse(typeof(GhostWorldPresence.GhostID), ghostID, false, out var rawEnumBase);
-            game.sawAGhost = rawEnumBase as GhostWorldPresence.GhostID;
-            game.GetStorySession.AppendTimeOnCycleEnd(true);
-            if (game.GetStorySession.saveState.deathPersistentSaveData.karmaCap < 9)
-            {
-                game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.GhostScreen);
-                return;
-            }
-            game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.KarmaToMaxScreen);
-        }
-
 
         [RPCMethod]
         public static void KickToLobby()
