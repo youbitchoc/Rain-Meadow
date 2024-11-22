@@ -78,6 +78,12 @@ namespace RainMeadow
             On.Menu.SlugcatSelectMenu.SliderSetValue += SlugcatSelectMenu_SliderSetValue;
             On.Menu.SlugcatSelectMenu.SetChecked += SlugcatSelectMenu_SetChecked;
             On.Menu.SlugcatSelectMenu.GetChecked += SlugcatSelectMenu_GetChecked;
+
+            On.Spear.ctor += (orig, self, apo, world) =>
+            {
+                apo.destroyOnAbstraction = true;
+                orig(self, apo, world);
+            };
         }
 
 

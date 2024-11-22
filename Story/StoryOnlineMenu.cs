@@ -58,6 +58,7 @@ namespace RainMeadow
             if (OnlineManager.lobby.isOwner)
             {
                 personaSettings.playingAs = storyGameMode.currentCampaign = storyGameCharacter;
+                personaSettings.playingAs = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName.Spear;
             }
             else
             {

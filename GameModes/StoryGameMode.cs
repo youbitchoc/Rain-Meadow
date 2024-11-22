@@ -57,11 +57,13 @@ namespace RainMeadow
 
         public override bool AllowedInMode(PlacedObject item)
         {
+            return false;
             return base.AllowedInMode(item) || OnlineGameModeHelpers.PlayerGrabbableItems.Contains(item.type) || OnlineGameModeHelpers.creatureRelatedItems.Contains(item.type);
         }
 
         public override bool ShouldLoadCreatures(RainWorldGame game, WorldSession worldSession)
         {
+            return false;
             if (OnlineManager.mePlayer.isActuallySpectating)
             {
                 return false;
@@ -84,6 +86,10 @@ namespace RainMeadow
 
         public override bool ShouldSyncAPOInWorld(WorldSession ws, AbstractPhysicalObject apo)
         {
+            if (apo is AbstractSpear)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -99,6 +105,7 @@ namespace RainMeadow
 
         public override bool ShouldSpawnFly(FliesWorldAI self, int spawnRoom)
         {
+            return false;
             if (OnlineManager.mePlayer.isActuallySpectating)
             {
                 return false;
