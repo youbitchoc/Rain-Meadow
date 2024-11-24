@@ -100,9 +100,13 @@ namespace RainMeadow
                 entitiesJoined = new(resource.joinedEntities.Values.ToList());
                 entityStates = new(resource.activeEntities.Select(e => e.GetState(ts, resource)).ToList());
                 resourceDataStates = new(resource.resourceData.Values.Select(d => d.MakeState(resource)).Where(s => s != null).ToList());
+                RainMeadow.Debug($"creating ResourceState for {resource}");
+                RainMeadow.Debug($"joined: [ {string.Join(", ", entitiesJoined.list.Select(x => x.entityId.FindEntity()?.ToString() ?? x.entityId.ToString()))} ]");
             }
             public virtual void ReadTo(OnlineResource resource)
             {
+                RainMeadow.Debug($"reading ResourceState for {resource}");
+                RainMeadow.Debug($"joined: [ {string.Join(", ", entitiesJoined.list.Select(x => x.entityId.FindEntity()?.ToString() ?? x.entityId.ToString()))} ]");
                 if (resource.isActive)
                 {
                     foreach (var def in registeredEntities.list)
